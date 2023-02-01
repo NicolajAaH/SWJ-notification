@@ -12,8 +12,6 @@ env:
   DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
   IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/swj-notification
-  EMAIL: ${{ secrets.EMAIL }}
-  EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
 
 jobs:
   build:
@@ -34,4 +32,3 @@ jobs:
           context: .
           push: true
           tags: ${{ env.IMAGE_NAME }}
-          env: EMAIL=${{ env.EMAIL }} PASSWORD=${{ env.EMAIL_PASSWORD }}
