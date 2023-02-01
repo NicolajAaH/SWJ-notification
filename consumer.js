@@ -47,6 +47,7 @@ amqp.connect(`amqp://${process.env.RABBITURL}`, (error0, connection) => {
                     fetch(authServiceUrl, {method: 'GET'})
                         .then((response) => response.json())
                         .then((data) => {
+                            console.log(data);
                             const emails = data.emails;
                             emails.forEach((email) => {
                                 const mailOptions = {
