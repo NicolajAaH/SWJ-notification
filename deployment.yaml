@@ -18,5 +18,5 @@ spec:
           env:
             - name: AUTHENTICATIONURL
               value: http://authentication-service:3000
-            - name: KAFKAURL
-              value: zookeeper:2181
+            - name: RABBITURL
+              value: rabbitmq-service:5672

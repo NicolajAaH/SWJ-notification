@@ -1,7 +1,7 @@
-const kafka = require('kafka-node');
-const nodemailer = require('nodemailer');
-const request = require('request');
+var amqp = require('amqplib/callback_api');
+var nodemailer = require('nodemailer');
 require('dotenv').config();
+const axios = require('axios');
 
 const authServiceUrl = `${process.env.AUTHENTICATIONURL}/users/emails`;
 
@@ -12,46 +12,62 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASSWORD
   }
 });
-
-const Consumer = kafka.Consumer;
-const client = new kafka.KafkaClient({ kafkaHost: `${process.env.KAFKAURL}` });
-const consumer = new Consumer(
-  client,
-  [{ topic: 'NEW_JOB', partition: 0 }],
-  {
-    autoCommit: true
-  }
-);
-
-consumer.on('message', async function(message) {
-  const job = JSON.parse(message.value);
-  console.log(`Received job: ${job}`);
-
-  request(authServiceUrl, { json: true }, async (err, res, body) => {
-    if (err) {
-      console.error(err);
-      return;
+const RabbitMQConfig = {
+    NEW_JOB_EXCHANGE: "NEW_JOB_EXCHANGE",
+    NEW_JOB_QUEUE: "NEW_JOB_QUEUE",
+    NEW_JOB_ROUTING_KEY: "new.job"
+  };
+  
+  amqp.connect(`amqp://${process.env.RABBITURL}`, (error0, connection) => {
+    if (error0) {
+      throw error0;
     }
-
-    const registeredUsers = body.users;
-    for (const user of registeredUsers) {
-      const mailOptions = {
-        from: process.env.EMAIL,
-        to: process.env.EMAIL,
-        subject: 'New job opportunity',
-        text: `A new job with the title "${job.title}" is available.`
-      };
-
-      await transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log(`Email sent: ${info.response}`);
-        }
+    connection.createChannel((error1, channel) => {
+      if (error1) {
+        throw error1;
+      }
+      channel.assertExchange(RabbitMQConfig.NEW_JOB_EXCHANGE, 'topic', {
+        durable: false
       });
-    }
+      channel.assertQueue(RabbitMQConfig.NEW_JOB_QUEUE, {
+        exclusive: false
+      }, (error2, q) => {
+        if (error2) {
+          throw error2;
+        }
+        console.log("Waiting for messages in %s", q.queue);
+        channel.bindQueue(q.queue, RabbitMQConfig.NEW_JOB_EXCHANGE, RabbitMQConfig.NEW_JOB_ROUTING_KEY);
+        channel.consume(q.queue, (message) => {
+          if (message !== null) {
+            const messageContent = message.content.toString();
+            console.log("Received %s", messageContent);
+            axios.get(authServiceUrl)
+              .then((response) => {
+                const emails = response.data.emails;
+                emails.forEach((email) => {
+                  const mailOptions = {
+                    from: process.env.EMAIL,
+                    to: email,
+                    subject: 'New job available',
+                    text: messageContent.title
+                  };
+                  transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                      console.log(error);
+                    } else {
+                      console.log('Email sent: %s', info.messageId);
+                    }
+                  });
+                });
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+            channel.ack(message);
+          }
+        }, {
+          noAck: false
+        });
+      });
+    });
   });
-});
-
-consumer.connect();
-console.log('Kafka consumer connected and subscribed to topic NEW_JOB');
