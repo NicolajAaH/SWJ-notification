@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+        - name: notification-service
+          image: nicolajh/swj-notification
+          env:
+            - name: AUTHENTICATIONURL
+              value: http://authentication-service:3000
+            - name: KAFKAURL
+              value: http://zookeeper:2181
