@@ -5,8 +5,6 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 
 const authServiceUrl = `${process.env.URL_AUTHENTICATIONSERVICE}/users/emails`;
 
-console.log(authServiceUrl);
-
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -46,7 +44,7 @@ amqp.connect(`amqp://${process.env.RABBITURL}`, (error0, connection) => {
                     const job = JSON.parse(messageContent);
                     const title = job.title;
                     console.log("Title: %s", title);
-                    fetch(authServiceUrl)
+                    fetch(authServiceUrl, {method: 'GET'})
                         .then((response) => response.json())
                         .then((data) => {
                             const emails = data.emails;
