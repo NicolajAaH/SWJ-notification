@@ -16,7 +16,7 @@ spec:
         - name: notification-service
           image: nicolajh/swj-notification
           env:
-            - name: AUTHENTICATIONURL
-              value: authentication-service:3000
+            - name: URL_AUTHENTICATIONSERVICE
+              value: http://authentication-service:3000
             - name: RABBITURL
               value: rabbitmq-service:5672

@@ -3,7 +3,7 @@ var nodemailer = require('nodemailer');
 require('dotenv').config();
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
-const authServiceUrl = `http://${process.env.AUTHENTICATIONURL}/users/emails`;
+const authServiceUrl = `${process.env.URL_AUTHENTICATIONSERVICE}/users/emails`;
 
 console.log(authServiceUrl);
 
