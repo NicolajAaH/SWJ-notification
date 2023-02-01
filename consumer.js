@@ -5,13 +5,13 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 
 const authServiceUrl = `${process.env.URL_AUTHENTICATIONSERVICE}/users/emails`;
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD
-    }
-});
+//const transporter = nodemailer.createTransport({
+//    service: 'gmail',
+//    auth: {
+//        user: process.env.EMAIL,
+//        pass: process.env.EMAIL_PASSWORD
+//    }
+//});
 const RabbitMQConfig = {
     NEW_JOB_EXCHANGE: "NEW_JOB_EXCHANGE",
     NEW_JOB_QUEUE: "NEW_JOB_QUEUE",
@@ -48,19 +48,21 @@ amqp.connect(`amqp://${process.env.RABBITURL}`, (error0, connection) => {
                         .then((response) => response.json())
                         .then((data) => {
                             data.forEach((email) => {
-                                const mailOptions = {
-                                    from: process.env.EMAIL,
-                                    to: process.env.EMAIL,
-                                    subject: 'New job available',
-                                    text: title
-                                };
-                                transporter.sendMail(mailOptions, (error, info) => {
-                                    if (error) {
-                                        console.log(error);
-                                    } else {
-                                        console.log('Email sent: %s', info.messageId);
-                                    }
-                                });
+                                console.log("Email: %s", email);
+                                console.log("Title: %s", title);
+                                //const mailOptions = {
+                                //    from: process.env.EMAIL,
+                                //    to: process.env.EMAIL,
+                                //    subject: 'New job available',
+                                //    text: title
+                                //};
+                                //transporter.sendMail(mailOptions, (error, info) => {
+                                //    if (error) {
+                                //        console.log(error);
+                                //    } else {
+                                //        console.log('Email sent: %s', info.messageId);
+                                //    }
+                                //});
                             });
                         })
                         .catch((error) => {
