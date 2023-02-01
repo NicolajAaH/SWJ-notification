@@ -39,10 +39,9 @@ amqp.connect(`amqp://${process.env.RABBITURL}`, (error0, connection) => {
             channel.bindQueue(q.queue, RabbitMQConfig.NEW_JOB_EXCHANGE, RabbitMQConfig.NEW_JOB_ROUTING_KEY);
             channel.consume(q.queue, (message) => {
                 if (message !== null) {
-                    const messageContent = message.content.toString();
+                    const messageContent = message.content.JSON();
                     console.log("Received %s", messageContent);
-                    const job = JSON.parse(messageContent);
-                    const title = job.title;
+                    const title = messageContent.title;
                     fetch(authServiceUrl)
                         .then((response) => response.json())
                         .then((data) => {
