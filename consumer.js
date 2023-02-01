@@ -37,7 +37,7 @@ consumer.on('message', async function(message) {
     for (const user of registeredUsers) {
       const mailOptions = {
         from: process.env.EMAIL,
-        to: user.email,
+        to: process.env.EMAIL,
         subject: 'New job opportunity',
         text: `A new job with the title "${job.title}" is available.`
       };

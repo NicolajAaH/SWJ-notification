@@ -19,4 +19,4 @@ spec:
             - name: AUTHENTICATIONURL
               value: http://authentication-service:3000
             - name: KAFKAURL
-              value: http://zookeeper:2181
+              value: zookeeper:2181
