@@ -20,3 +20,13 @@ spec:
               value: http://authentication-service:3000
             - name: RABBITURL
               value: rabbitmq-service:5672
+            - name: EMAIL
+              valueFrom:
+                configMapKeyRef:
+                  name: gmail
+                  key: EMAIL
+            - name: EMAIL_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: gmail
+                  key: EMAIL_PASSWORD

@@ -50,7 +50,7 @@ amqp.connect(`amqp://${process.env.RABBITURL}`, (error0, connection) => {
                             data.forEach((email) => {
                                 const mailOptions = {
                                     from: process.env.EMAIL,
-                                    to: email,
+                                    to: process.env.EMAIL,
                                     subject: 'New job available',
                                     text: title
                                 };
