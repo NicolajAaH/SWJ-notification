@@ -3,7 +3,9 @@ var nodemailer = require('nodemailer');
 require('dotenv').config();
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
-const authServiceUrl = `${process.env.AUTHENTICATIONURL}/users/emails`;
+const authServiceUrl = `http://${process.env.AUTHENTICATIONURL}/users/emails`;
+
+console.log(authServiceUrl);
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -45,7 +47,7 @@ amqp.connect(`amqp://${process.env.RABBITURL}`, (error0, connection) => {
                     const title = job.title;
                     console.log("Title: %s", title);
                     fetch(authServiceUrl)
-                        .then((response) => console.log(response))
+                        .then((response) => response.json())
                         .then((data) => {
                             const emails = data.emails;
                             emails.forEach((email) => {
