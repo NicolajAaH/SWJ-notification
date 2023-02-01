@@ -19,6 +19,8 @@
   "dependencies": {
     "amqplib": "^0.10.3",
     "dotenv": "^16.0.3",
+    "fetch": "^1.1.0",
+    "node-fetch": "^3.3.0",
     "nodemailer": "^6.9.1"
   }
 }

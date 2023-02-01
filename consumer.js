@@ -1,6 +1,7 @@
 var amqp = require('amqplib/callback_api');
 var nodemailer = require('nodemailer');
 require('dotenv').config();
+fetch = require('node-fetch');
 
 const authServiceUrl = `${process.env.AUTHENTICATIONURL}/users/emails`;
 
