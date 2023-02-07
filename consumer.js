@@ -1,7 +1,8 @@
-var amqp = require('amqplib/callback_api');
-var nodemailer = require('nodemailer');
+const amqp = require('amqplib/callback_api');
+const nodemailer = require('nodemailer');
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+
 require('dotenv').config();
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const authServiceUrl = `${process.env.URL_AUTHENTICATIONSERVICE}/users/emails`;
 
@@ -13,43 +14,39 @@ const authServiceUrl = `${process.env.URL_AUTHENTICATIONSERVICE}/users/emails`;
 //    }
 //});
 const RabbitMQConfig = {
-    NEW_JOB_EXCHANGE: "NEW_JOB_EXCHANGE",
-    NEW_JOB_QUEUE: "NEW_JOB_QUEUE",
-    NEW_JOB_ROUTING_KEY: "new.job"
+    NEW_JOB_EXCHANGE: 'NEW_JOB_EXCHANGE',
+    NEW_JOB_QUEUE: 'NEW_JOB_QUEUE',
+    NEW_JOB_ROUTING_KEY: 'new.job',
 };
 
-amqp.connect(`amqp://${process.env.RABBITURL}`, (error0, connection) => {
-    if (error0) {
-        throw error0;
+amqp.connect(`amqp://${process.env.RABBITURL}`, (error, connection) => {
+    if (error) {
+        throw error;
     }
-    connection.createChannel((error1, channel) => {
-        if (error1) {
-            throw error1;
+    connection.createChannel((channelError, channel) => {
+        if (channelError) {
+            throw channelError;
         }
-        channel.assertExchange(RabbitMQConfig.NEW_JOB_EXCHANGE, 'topic', {
-            durable: false
-        });
-        channel.assertQueue(RabbitMQConfig.NEW_JOB_QUEUE, {
-            exclusive: false
-        }, (error2, q) => {
-            if (error2) {
-                throw error2;
+        channel.assertExchange(RabbitMQConfig.NEW_JOB_EXCHANGE, 'topic', { durable: false });
+        channel.assertQueue(RabbitMQConfig.NEW_JOB_QUEUE, { exclusive: false }, (queueError, q) => {
+            if (queueError) {
+                throw queueError;
             }
-            console.log("Waiting for messages in %s", q.queue);
+            console.log(`Waiting for messages in ${q.queue}`);
             channel.bindQueue(q.queue, RabbitMQConfig.NEW_JOB_EXCHANGE, RabbitMQConfig.NEW_JOB_ROUTING_KEY);
-            channel.consume(q.queue, (message) => {
-                if (message !== null) {
+            channel.consume(q.queue, message => {
+                if (message) {
                     const messageContent = message.content.toString();
-                    console.log("Received %s", messageContent);
+                    console.log(`Received ${messageContent}`);
                     const job = JSON.parse(messageContent);
                     const title = job.title;
-                    console.log("Title: %s", title);
-                    fetch(authServiceUrl, {method: 'GET'})
-                        .then((response) => response.json())
-                        .then((data) => {
-                            data.forEach((email) => {
-                                console.log("Email: %s", email);
-                                console.log("Title: %s", title);
+                    console.log(`Title: ${title}`);
+                    fetch(authServiceUrl, { method: 'GET' })
+                        .then(response => response.json())
+                        .then(data => {
+                            data.forEach(email => {
+                                console.log(`Email: ${email}`);
+                                console.log(`Title: ${title}`);
                                 //const mailOptions = {
                                 //    from: process.env.EMAIL,
                                 //    to: process.env.EMAIL,
@@ -65,15 +62,12 @@ amqp.connect(`amqp://${process.env.RABBITURL}`, (error0, connection) => {
                                 //});
                             });
                         })
-                        .catch((error) => {
+                        .catch(error => {
                             console.error(error);
                         });
-
                     channel.ack(message);
                 }
-            }, {
-                noAck: false
-            });
+            }, { noAck: false });
         });
     });
 });
