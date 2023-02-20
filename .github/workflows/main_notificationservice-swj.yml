@@ -3,10 +3,10 @@
 
 name: Build and deploy Node.js project to Azure Function App - notificationservice-swj
 
-on:
-  push:
-    branches:
-      - main
+on: 
+  #push: commented out for now due to AKS downscaling
+  #  branches:
+  #    - main
   workflow_dispatch:
 
 env:
