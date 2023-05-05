@@ -26,7 +26,7 @@ describe('Main function', () => {
 
         await main();
 
-        expect(secretClient).to.have.been.calledWith('SERVICEBUS_CONNECTION_STRING');
+        expect(secretClient).to.have.been.calledWith('SERVICEBUS-CONNECTION-STRING');
 
         expect(console.log).to.have.been.calledWith('Waiting for messages in notificationservice');
 
