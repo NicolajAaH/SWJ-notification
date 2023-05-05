@@ -42,12 +42,12 @@ async function sendMail(email, text){
 async function main() {
     const credential = new DefaultAzureCredential();
 
-    const keyVaultName = "job-boards-secret";
+    const keyVaultName = "swj-secret";
     const url = "https://" + keyVaultName + ".vault.azure.net";
 
     const client = new SecretClient(url, credential);
 
-    const SERVICEBUS_CONNECTION_STRING = await client.getSecret("SERVICEBUS_CONNECTION_STRING");
+    const SERVICEBUS_CONNECTION_STRING = await client.getSecret("SERVICEBUS-CONNECTION-STRING");
 
     const serviceBusClient = new ServiceBusClient(SERVICEBUS_CONNECTION_STRING.value);
     const receiver = serviceBusClient.createReceiver(ServiceBusConfig.NEW_JOB_TOPIC, ServiceBusConfig.NEW_JOB_SUBSCRIPTION);
