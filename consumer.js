@@ -40,6 +40,17 @@ async function sendMail(email, text){
 }
 
 async function main() {
+  const credential = new DefaultAzureCredential();
+
+  const keyVaultName = "swj-secret";
+  const url = "https://" + keyVaultName + ".vault.azure.net";
+
+  const client = new SecretClient(url, credential);
+
+  const SERVICEBUS_CONNECTION_STRING = await client.getSecret("SERVICEBUS-CONNECTION-STRING");
+
+  const serviceBusClient = new ServiceBusClient(SERVICEBUS_CONNECTION_STRING.value);
+  const receiver = serviceBusClient.createReceiver(ServiceBusConfig.NEW_JOB_TOPIC, ServiceBusConfig.NEW_JOB_SUBSCRIPTION);
     console.log(`Waiting for messages in ${ServiceBusConfig.NEW_JOB_SUBSCRIPTION}`);
 
     receiver.subscribe({
@@ -54,10 +65,5 @@ async function main() {
         }
     );
 }
-
-main().catch((error) => {
-    console.log(error);
-    process.exit(1);
-});
 
 module.exports = main;
