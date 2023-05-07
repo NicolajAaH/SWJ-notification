@@ -4,7 +4,7 @@
   "description": "Notification service for SoftwareJobs",
   "main": "consumer.js",
   "scripts": {
-    "test": "mocha --exit"
+    "test": "nyc mocha --exit"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
     "msw": "^1.0.0",
     "node-fetch": "^3.3.0",
     "nodemailer": "^6.9.1",
+    "nyc": "^15.1.0",
     "sinon": "^15.0.1",
     "sinon-chai": "^3.7.0"
   }
