@@ -22,7 +22,7 @@ describe('Main function', () => {
 
         sinon.stub(console, 'log');
 
-        const main = require('../consumer');
+        const main = require('../consumerKubernetes');
 
         await main();
 

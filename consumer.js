@@ -6,10 +6,9 @@ var nodemailer = require('nodemailer');
 
 require('dotenv').config();
 
-const ServiceBusConfig = {
-    NEW_JOB_TOPIC: 'new_job',
-    NEW_JOB_SUBSCRIPTION: 'notificationservice',
-};
+/**
+ * To be used if the service is deployed on Azure Function
+ */
 
 /*var transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -40,36 +39,8 @@ async function sendMail(email, text){
 }
 
 async function main() {
-    const credential = new DefaultAzureCredential();
-
-    const keyVaultName = "swj-secret";
-    const url = "https://" + keyVaultName + ".vault.azure.net";
-
-    const client = new SecretClient(url, credential);
-
-    const SERVICEBUS_CONNECTION_STRING = await client.getSecret("SERVICEBUS-CONNECTION-STRING");
-
-    const serviceBusClient = new ServiceBusClient(SERVICEBUS_CONNECTION_STRING.value);
-    const receiver = serviceBusClient.createReceiver(ServiceBusConfig.NEW_JOB_TOPIC, ServiceBusConfig.NEW_JOB_SUBSCRIPTION);
-
-    console.log(`Waiting for messages in ${ServiceBusConfig.NEW_JOB_SUBSCRIPTION}`);
-
-    receiver.subscribe({
-            processMessage: async (brokeredMessage) => {
-                console.log(`New job: ${brokeredMessage.body}`);
-                await sendMail('email', brokeredMessage.body.text); //TODO: change to actual email - email set to temporary email for testing
-                await brokeredMessage.complete();
-            },
-            processError: async (args) => {
-                console.log(`Error from error source ${args.errorSource} occurred: `, args.error);
-            },
-        }
-    );
+  console.log(`New job: ${brokeredMessage.body}`);
+  await sendMail('email', brokeredMessage.body.text); //TODO: change to actual email - email set to temporary email for testing
 }
-
-main().catch((error) => {
-    console.log(error);
-    process.exit(1);
-});
 
 module.exports = main;
